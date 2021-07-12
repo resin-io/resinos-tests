@@ -100,8 +100,8 @@ module.exports = class Worker {
 		await rp.post(`${this.url}/dut/off`);
 	}
 
-	async network(network) {
-		await rp.post({
+	network(network) {
+		return rp.post({
 			uri: `${this.url}/dut/network`,
 			body: network,
 			json: true,

@@ -96,7 +96,23 @@ async function setup(): Promise<express.Application> {
 		) => {
 			try {
 				await worker.network(req.body);
-				res.send('OK');
+
+				let ip;
+				if (req.body.wired && (worker.state.network.wired != null)) {
+					ip = {
+						ip: getIpFromIface(worker.state.network.wired),
+					};
+				}
+				if (req.body.wireless && (worker.state.network.wireless != null)) {
+					ip = {
+						ip: getIpFromIface(worker.state.network.wireless),
+					};
+				}
+				if (ip == null) {
+					throw new Error('DUT network could not be found');
+				}
+
+				res.send(ip);
 			} catch (err) {
 				console.error(err);
 				next(err);
