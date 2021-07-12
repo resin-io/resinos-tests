@@ -22,9 +22,11 @@ const { basename, dirname, join } = require('path');
 
 module.exports = class CLI {
 	constructor(
+		apiUrl='balena-cloud.com',
 		logger = { log: console.log, status: console.log, info: console.log },
 	) {
 		this.logger = logger;
+		exec(`BALENARC_BALENA_URL=${apiUrl}`)
 	}
 
 	async preload(image, options) {
