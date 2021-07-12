@@ -1,3 +1,12 @@
+/**
+ * # Test suites lifecycle (with node-tap)
+ *
+ * Contains code to parse, prepare, execute, monitor and teardown test suites and their tests that
+ * are queued up for testing as per the configuration.
+ *
+ * @module Suite
+ */
+
 /*
  * Copyright 2018 balena
  *
@@ -95,9 +104,9 @@ class Suite {
 		await Bluebird.try(async () => {
 			await this.installDependencies();
 			await fs.ensureDir(config.get('leviathan.downloads'));
-			if(fs.existsSync(config.get('leviathan.artifacts'))){
+			if (fs.existsSync(config.get('leviathan.artifacts'))) {
 				this.state.log(`Removing artifacts from previous tests...`);
-				fs.emptyDirSync(config.get('leviathan.artifacts'))
+				fs.emptyDirSync(config.get('leviathan.artifacts'));
 			}
 			this.rootTree = this.resolveTestTree(
 				path.join(config.get('leviathan.uploads.suite'), 'suite'),
@@ -252,10 +261,10 @@ class Suite {
 		);
 	}
 
-	async removeDownloads(){
+	async removeDownloads() {
 		if (fs.existsSync(config.get('leviathan.downloads'))) {
 			this.state.log(`Removing downloads directory...`);
-			fs.emptyDirSync(config.get('leviathan.downloads'))
+			fs.emptyDirSync(config.get('leviathan.downloads'));
 		}
 	}
 }

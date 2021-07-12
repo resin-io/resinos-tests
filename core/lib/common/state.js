@@ -1,3 +1,12 @@
+/**
+ * # Test State Logging
+ *
+ * Includes methods to capture different types of message and send them back to the client.
+ * 3 types of messages, log, status, info.
+ *
+ * @module State
+ */
+
 module.exports = class State {
 	constructor() {
 		this._log = [];

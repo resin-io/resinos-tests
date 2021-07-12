@@ -1,0 +1,28 @@
+{
+    "groups": [
+        {
+            "title": "Getting Started",
+            "pages": [
+                {
+                    "title": "Quickstart",
+                    "source": "../documentation/quickstart.md"
+                },
+                {
+                    "title": "Config.js Reference",
+                    "source": "../documentation/config-reference.md"
+                },
+                {
+                    "title": "Writing tests",
+                    "source": "../documentation/writing-tests.md"
+                },
+                {
+                    "title": "Tips & Reference",
+                    "source": "../documentation/reference-tips.md"
+                }
+            ]
+        }
+    ],
+    "output": "pages",
+    "listInvalidSymbolLinks": false,
+    "reflectionNavigationTitle": "Helper Methods"
+}

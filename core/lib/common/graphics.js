@@ -1,3 +1,27 @@
+/**
+ * # Screen Capture
+ *
+ * If screen capture is supported and appropriate hardware is attached, the video output of the DUT
+ * can be captured. For the testbot, this requires a compatible video capture device to be connected
+ * that works with v4L2 and enumerates on the `/dev/video0` interface. If that is the case, then
+ * capture can be started using the `Worker` class `capture()` method, for example:
+ *
+ * @example
+ * ```js
+ * const Worker = this.require('common/worker');
+ * const worker = new Worker('DEVICE_TYPE_SLUG', this.getLogger())
+ * await worker.capture('start');
+ * ```
+ *
+ * This will trigger video capture to start, and frames will be saved as `jpg` files in the `/data/capture` directory (which is a shared volume). Capture will continue until stopped with:
+ *
+ * ```js
+ * await worker.capture('stop');
+ * ```
+ *
+ * @module Graphics
+ */
+
 /*
  * Copyright 2019 balena
  *
@@ -16,7 +40,6 @@
 
 'use strict';
 
-// Helper funciton for blockhash
 function median(data) {
 	const mdarr = data.slice(0);
 	mdarr.sort(function(a, b) {

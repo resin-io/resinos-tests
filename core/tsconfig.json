@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "typeRoots": [
+      "typings",
+      "node_modules/@types"
+    ],
+    "module": "commonjs",
+    "target": "es2019",
+    "allowJs": true,
+    "outDir": "build",
+    "strict": true,
+    "preserveConstEnums": true,
+    "declaration": true,
+    "pretty": true,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
+  },
+  "exclude": [
+    "node_modules/**",
+  ],
+  "typedocOptions": {
+    "name": "Leviathan Helpers",
+    "entryPoints": ["lib/common", "lib/components"],
+    "out": "docs",
+    "theme": "pages-plugin",
+    "excludeExternals": true,
+    "excludePrivate": true,
+    "excludeProtected": true,
+    // "excludeNotDocumented": true,
+    "categorizeByGroup": true,
+    "categoryOrder": ["helper", "*"],
+    "highlightTheme": "dark-plus",
+  }
+}

@@ -1,3 +1,9 @@
+/**
+ * ## [Deprecated] Helpers for Sync functionality
+ *
+ * @module Sync helper
+ */
+
 /*
  * Copyright 2018 balena
  *

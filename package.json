@@ -4,7 +4,8 @@
   "scripts": {
     "prettify": "for component in 'suites' 'worker' 'core' 'client'; do npm --prefix $component run prettify; done",
     "lint": "for component in 'suites' 'worker' 'core' 'client'; do npm --prefix $component run lint; done",
-    "preinstall": "for component in 'suites' 'worker' 'core' 'client'; do npm --prefix $component install; done"
+    "preinstall": "for component in 'suites' 'worker' 'core' 'client'; do npm --prefix $component install; done",
+    "docs": "npm --prefix core run docs"
   },
   "repository": {
     "type": "git",

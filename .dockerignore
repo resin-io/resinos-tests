@@ -4,3 +4,4 @@ workspace/
 documentation/
 
 .balena/secrets/
+core/docs
