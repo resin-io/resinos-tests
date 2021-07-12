@@ -5,7 +5,7 @@ import {
 	TestBotHat,
 } from '@balena/testbot';
 import { EventEmitter } from 'events';
-import { createWriteStream } from 'fs';
+import { createWriteStream, unlink } from 'fs';
 import { join } from 'path';
 import * as Stream from 'stream';
 import { manageHandlers } from '../helpers';
@@ -72,7 +72,7 @@ class TestBotWorker extends EventEmitter implements Leviathan.Worker {
 	public async powerOn() {
 		const dutLog = await this.hatBoard.openDutSerial();
 		if (dutLog) {
-			this.dutLogStream = createWriteStream(dutSerialPath);
+			this.dutLogStream = createWriteStream(dutSerialPath, { flags: 'a' });
 			dutLog.pipe(this.dutLogStream);
 		}
 		console.log('Trying to power on DUT...');
@@ -147,6 +147,9 @@ class TestBotWorker extends EventEmitter implements Leviathan.Worker {
 			if (this.networkCtl != null) {
 				await this.networkCtl.teardown();
 			}
+
+      unlink(dutSerialPath);
+
 		} finally {
 			if (signal != null) {
 				process.kill(process.pid, signal);

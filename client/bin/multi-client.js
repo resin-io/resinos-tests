@@ -131,7 +131,7 @@ class NonInteractiveState {
 		if (!workerData.workerUrl) {
 			return;
 		}
-		const dutLogUrl = `${workerData.workerUrl}/reports/dut-serial.txt`;
+		const dutLogUrl = new URL('/reports/dut-serial.txt', workerData.workerUrl).href;
 		console.log(`Downloading DUT serial log with ${dutLogUrl}`);
 		const downloadLog = request
 			.get(dutLogUrl)
@@ -139,8 +139,8 @@ class NonInteractiveState {
 		let downloadLogDone =  new Promise(resolve =>
 			downloadLog.on('end', resolve).on('error', resolve),
 		);
-		const dutArtifactUrl = `${workerData.workerUrl}/artifacts`;
-		console.log(`Downloading artifacts`);
+		const dutArtifactUrl = new URL('/artifacts', workerData.workerUrl).href;
+		console.log(`Downloading DUT artifacts with ${dutArtifactUrl}`);
 		const downloadImages = request
 			.get(dutArtifactUrl)
 			.pipe(nativeFs.createWriteStream(`reports/artifacts-${workerData.prefix}.tar.gz`));
@@ -469,7 +469,7 @@ class State {
 					// check if device is idle & public URL is reachable
 					let deviceUrl = await balenaCloud.resolveDeviceUrl(device)
 					try{
-						let status = await rp.get(`${deviceUrl}/state`);
+						let status = await rp.get(new URL('/state', deviceUrl).href);
 						if (status === "IDLE") {
 							// make sure that the worker being targetted isn't already about to be used by another child process
 							if(!busyWorkers.includes(deviceUrl)){
