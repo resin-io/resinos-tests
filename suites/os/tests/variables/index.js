@@ -15,58 +15,27 @@
 
 'use strict';
 
-const retry = require('bluebird-retry');
-const request = require('request-promise');
-
 module.exports = {
 	title: 'Container exposed variables test',
 	os: {
-		type: 'string',
+		type: 'object',
 		required: ['variant'],
-		const: 'development',
+		properties: {
+			variant: {
+				type: 'string',
+				const: 'Development',
+			},
+		},
 	},
 	run: async function(test) {
 		const ip = await this.context.get().worker.ip(this.context.get().link);
-		await retry(
-			async () => {
-				await this.context.get().balena.cli.push(ip, {
-					source: __dirname,
-				});
-			},
-			{
-				max_tries: 60,
-				interval: 5000,
-			},
-		);
 
-		await retry(
-			await this.context.get().utils.waitUntil(async () => {
-				const state = await request({
-					method: 'GET',
-					uri: `http://${ip}:48484/v2/containerId`,
-					json: true,
-				});
-
-				return state.services.variables != null;
-			}),
-			{
-				max_tries: 60,
-				interval: 5000,
-			},
-		);
-
-		const state = await request({
-			method: 'GET',
-			uri: `http://${ip}:48484/v2/containerId`,
-			json: true,
-		});
-
+		await this.context
+			.get()
+			.worker.pushContainerToDUT(ip, __dirname, 'variables');
 		const env = await this.context
 			.get()
-			.worker.executeCommandInHostOS(
-				`balena exec ${state.services.variables} env`,
-				ip,
-			);
+			.worker.executeCommandInContainer('env', 'variables', ip);
 
 		const result = {};
 		env.split('\n').forEach(element => {
@@ -83,7 +52,6 @@ module.exports = {
 				'DEVICE_UUID',
 				'DEVICE_TYPE',
 				'HOST_OS_VERSION',
-				'SUPERVISOR_VERSION',
 				'APP_LOCK_PATH',
 				'',
 			].forEach(variable => {

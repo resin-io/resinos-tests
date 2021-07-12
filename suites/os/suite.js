@@ -16,7 +16,7 @@ module.exports = {
 	run: async function() {
 		const Worker = this.require('common/worker');
 		const BalenaOS = this.require('components/os/balenaos');
-
+		const CLI = this.require('components/balena/cli');
 		await fse.ensureDir(this.suite.options.tmpdir);
 
 		this.suite.context.set({
@@ -24,6 +24,7 @@ module.exports = {
 			sshKeyPath: join(homedir(), 'id'),
 			link: `${this.suite.options.balenaOS.config.uuid.slice(0, 7)}.local`,
 			worker: new Worker(this.suite.deviceType.slug, this.getLogger()),
+			balena: { cli: new CLI(this.getLogger()) },
 		});
 		// Network definitions
 		if (this.suite.options.balenaOS.network.wired === true) {
@@ -58,6 +59,7 @@ module.exports = {
 							],
 						},
 						// persistentLogging is managed by the supervisor and only read at first boot
+						localMode: true,
 						persistentLogging: true,
 					},
 				},
@@ -100,8 +102,10 @@ module.exports = {
 	},
 	tests: [
 		'./tests/fingerprint',
-		'./tests/led',
+		// './tests/led',
 		'./tests/config-json',
+		'./tests/healthcheck',
+		'./tests/variables',
 		// The boot splash test is currently disabled because of the excessive time spent on it.
 		// './tests/boot-splash',
 		'./tests/connectivity',

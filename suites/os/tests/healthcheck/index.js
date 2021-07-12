@@ -22,9 +22,14 @@ const rp = require('request-promise');
 module.exports = {
 	title: 'Container healthcheck test',
 	os: {
-		type: 'string',
+		type: 'object',
 		required: ['variant'],
-		const: 'development',
+		properties: {
+			variant: {
+				type: 'string',
+				const: 'Development',
+			},
+		},
 	},
 	run: async function(test) {
 		const ip = await this.context.get().worker.ip(this.context.get().link);
@@ -35,8 +40,8 @@ module.exports = {
 				});
 			},
 			{
-				max_tries: 60,
-				interval: 5000,
+				max_tries: 20,
+				interval: 1000,
 			},
 		);
 		await this.context.get().utils.waitUntil(async () => {
@@ -45,7 +50,6 @@ module.exports = {
 				uri: `http://${ip}:48484/v2/containerId`,
 				json: true,
 			});
-
 			return state.services.healthcheck != null;
 		});
 		const state = await rp({
@@ -61,8 +65,7 @@ module.exports = {
 				`balena exec ${state.services.healthcheck} rm /tmp/health`,
 				ip,
 			);
-
-		await delay(2000);
+		await delay(4000);
 
 		const events = JSON.parse(
 			await this.context
