@@ -52,15 +52,11 @@ module.exports = class CLI {
 				: false;
 		});
 
-		if (Mount == null || dirname(image) !== Mount.Destination) {
-			throw new Error(
-				'OS image not found in the expected volume, cannot preload.',
-			);
-		}
-
+		image = image.replace(Mount.Destination, "")
+		
 		// We have to deal with the fact that our image exist on the fs the preloader runs in a different
 		// path than where our docker daemon runs. Until we fix the issue on the preloader
-		await ensureFile(join(Mount.Source, basename(image)));
+		await ensureFile(join(Mount.Source, image));
 
 		this.logger.log('Preloading image');
 		await new Promise((resolve, reject) => {
@@ -70,7 +66,7 @@ module.exports = class CLI {
 				[
 					`preload ${join(
 						Mount.Source,
-						basename(image),
+						image,
 					)} --docker ${socketPath} --app ${options.app} --commit ${
 						options.commit
 					} ${options.pin ? '--pin-device-to-release ' : ''}`,

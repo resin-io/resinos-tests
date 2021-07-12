@@ -12,7 +12,7 @@ module.exports = {
   },
   leviathan: {
     artifacts: '/tmp/artifacts',    // To store artifacts meant to be reported as results at the end of the suite
-    downloads: '/tmp/downloads',    // To store/download assets needed for the suite (non-persistent) 
+    downloads: '/data/downloads',    // To store/download assets needed for the suite (non-persistent) 
     workdir: '/data',
     uploads: defer(function() {
       return mapValues({ image: 'os.img', config: 'config.json', suite: 'suite' }, value => {
