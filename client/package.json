@@ -35,7 +35,7 @@
 		"request-promise": "^4.2.4",
 		"tar-fs": "^2.0.0",
 		"tar-stream": "^2.1.0",
-		"ws": "^7.1.2",
+		"ws": "^7.4.6",
 		"yargs": "^13.2.4"
 	},
 	"devDependencies": {
