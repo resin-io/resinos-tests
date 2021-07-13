@@ -1,3 +1,23 @@
+/**
+ * # Send reports/artifacts from testbot back to client
+ *
+ * By default, serial logs (given that the hardware is set up correctly), and the
+ * logs from the tests will be sent back to the client that started the test, upon
+ * the test finishing. Other artifacts can be sent back to the client using the
+ * `archiver` method. This method is available within any test:
+ *
+ * @example
+ * ```js
+ * this.archiver.add(`path/of/FILE`)
+ * ```
+ *
+ * Using this method, at the end of the test, any artifacts added to the archive are compressed and
+ * downloaded by the client. These are available in the `workspace/reports` directory at the end of
+ * the test. This can also be helpful when storing diagigggddddd
+ *
+ * @module Archiver
+ */
+
 /*
  * Copyright 2019 balena
  *

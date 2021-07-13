@@ -1,3 +1,9 @@
+/**
+ * # Test logic for Leviathan tests
+ *
+ * @module Test
+ */
+
 /*
  * Copyright 2018 balena
  *

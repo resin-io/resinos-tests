@@ -1,4 +1,6 @@
-# Quick start guide for leviathan
+# [Deprecated] Quick start guide for leviathan
+
+> This guide has been split into multiple pages in the same folder. You can read more about Leviathan from there. 
 
 This is a quick start guide for using the leviathan remote testing framework, with a testbot. As a prerequisite for this guide, you will have to prepare your testbot, using the following [guide](https://github.com/balena-io/testbot-hardware/blob/master/documentation/getting-started.md).
 
@@ -17,7 +19,6 @@ module.exports = {
     config: {
         networkWired: false,
         networkWireless: true,
-        downloadType: 'local',
         interactiveTests: false,
         balenaApiKey: process.env.BALENACLOUD_API_KEY,
         balenaApiUrl: 'balena-cloud.com',
@@ -35,13 +36,16 @@ Information on properties in `config.js`:
 - `deviceType` is the Device Under Test (DUT) attached to the testbot. Example: Raspberrypi3 64-bit device, the `deviceType` property needs to be `raspberrypi3-64`.
 - `suite` is the absolute path to the test suite directory that you want to execute. The path after `__dirname` in the config is a path relative to the workspace directory.
 - `networkWired` and `networkWireless` properties for configuration of Network Manager. Used to configure the right mode of connection for the DUT to connect to the Access Point (AP) created by the testbot.
-- `downloadType` configures where the OS will be staged for upload to testbot. `local` is the only available value for it at the moment.
 - `interactiveTests` If it's a semi-auto test or not.
 - `balenaApiKey` is the balenaCloud API key used when running the release suite. Ideally, you can add it as an environment variable and reference it with `process.env.BALENACLOUD_API_KEY`.
 - `balenaApiUrl` is the balenaCloud environment you are targetting for your test suite. Production is `'balena-cloud.com'` and staging is `'balena-staging.com'`.
 - `organization` is the balenaCloud organizations where test applications are created. Ideally, you can add it as an environment variable and reference it with `process.env.BALENACLOUD_ORG`.
 - `image` is the absolute path to the balenaOS image that is flashed onto the Device Under Test (DUT). The image should be kept under the `workspace` directory. The path after `__dirname` in the config is a path relative to the workspace directory. Make sure to rename the image to balena.img. If you provide `balena.img` as your balenaOS image, then Leviathan will compress it for you in `gz` format. We recommend compressing beforehand, as it saves time.  
 - `workers` is the property where we specify precisely on which testbots the test suites will be executed on. You can specify this in multiple ways as per the requirement. 
+
+*Deprecated Properties*
+
+- - `downloadType` configures where the OS will be staged for upload to testbot. `local` is the only available value for it at the moment
 
 ### Different `workers` configurations available
 
@@ -80,7 +84,6 @@ module.exports = [{
         config: {
             networkWired: false,
             networkWireless: true,
-            downloadType: 'local',
             interactiveTests: false,
             balenaApiKey: process.env.BALENACLOUD_API_KEY,
             balenaApiUrl: 'balena-cloud.com',
@@ -98,7 +101,6 @@ module.exports = [{
         config: {
             networkWired: false,
             networkWireless: true,
-            downloadType: 'local',
             interactiveTests: false,
             balenaApiKey: process.env.BALENACLOUD_API_KEY,
             balenaApiUrl: 'balena-cloud.com',
@@ -116,7 +118,6 @@ module.exports = [{
         config: {
             networkWired: false,
             networkWireless: true,
-            downloadType: 'local',
             interactiveTests: false,
             balenaApiKey: process.env.BALENACLOUD_API_KEY,
             balenaApiUrl: 'balena-cloud.com',
@@ -141,7 +142,6 @@ module.exports = [{
         config: {
             networkWired: false,
             networkWireless: true,
-            downloadType: 'local',
             interactiveTests: false,
             balenaApiKey: process.env.BALENACLOUD_API_KEY,
             balenaApiUrl: 'balena-cloud.com',
@@ -156,7 +156,6 @@ module.exports = [{
         config: {
             networkWired: false,
             networkWireless: true,
-            downloadType: 'local',
             interactiveTests: false,
             balenaApiKey: process.env.BALENACLOUD_API_KEY,
             balenaApiUrl: 'balena-cloud.com',
@@ -341,11 +340,7 @@ const os = new BalenaOS(
 	this.getLogger(),
 );
 
-await os.fetch({
-	type: this.suite.options.balenaOS.download.type,
-	version: this.suite.options.balenaOS.download.version,
-	releaseInfo: this.suite.options.balenaOS.releaseInfo,
-});
+await os.fetch();
 
 await os.configure()
 ```
@@ -359,7 +354,7 @@ await exec(
 	} --config-network wifi --config-wifi-key ${
 		PASSWORD
 	}  --config-wifi-ssid ${
-		PASSWORD
+		SSID
 	}  `,
 ); 
 ```

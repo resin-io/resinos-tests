@@ -1,3 +1,33 @@
+/**
+ * # balenaCLI helpers
+ *
+ * balenaCLI helpers performs frequently executed tasks in order to keep things DRY.
+ * For one-off commands, it's recommended to not use the helpers and instead directly use the
+ * balenaCLI with the example explained below.
+ *
+ * @example The core service where the test suites run already has balenaCLI installed. There is no need to
+ * initalise the `CLI` class to run/execute any CLI command inside the tests. Instead use
+ *
+ * ```js
+ * const { exec } = require("child_process");
+ * await exec(`balena push joystart --source .`)
+ * ```
+ *
+ * To get output from the commands being exectued, use the callback
+ *
+ * ```js
+ * const { exec } = require("child_process");
+ * await exec(`balena logs alliance-fleet --service "normandy-sr0"`, (error, stdout, stderr) => {
+ *   if (error) {
+ *     throw new error
+ *   }
+ *   console.log(stdout)
+ * })
+ * ```
+ *
+ * @module balenaCLI helpers
+ */
+
 /* Copyright 2019 balena
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +57,14 @@ module.exports = class CLI {
 		this.logger = logger;
 	}
 
+	/**
+	 * Preload the image onto the target image
+	 *
+	 * @param {string} image path to the image
+	 * @param {*} options options to be executed with balena preload command
+	 *
+	 * @category helper
+	 */
 	async preload(image, options) {
 		const socketPath = (await pathExists('/var/run/balena.sock'))
 			? '/var/run/balena.sock'
@@ -110,6 +148,14 @@ module.exports = class CLI {
 		});
 	}
 
+	/**
+	 * Pushes application to local device locally
+	 *
+	 * @param {string} target The address/uuid of the device
+	 * @param {*} options Options to be executed with balena preload command
+	 *
+	 * @category helper
+	 */
 	push(target, options) {
 		this.logger.log('Performing local push');
 		return exec(
@@ -117,11 +163,23 @@ module.exports = class CLI {
 		);
 	}
 
+	/**
+	 * @param {string} token Session key or API token required for the authentication of balena-cli session
+	 *
+	 * @category helper
+	 */
 	loginWithToken(token) {
 		this.logger.log('Login CLI');
 		return exec(`balena login --token ${token}`);
 	}
 
+	/**
+	 * @param {string} target The address/UUID of the target device
+	 * @param {string} service The container/service for which logs are needed
+	 * @returns {string} logs of the service/container running on the target device
+	 *
+	 * @category helper
+	 */
 	logs(target, service) {
 		return exec(
 			`balena logs ${target} ${service ? '--service' + service : ''}`,

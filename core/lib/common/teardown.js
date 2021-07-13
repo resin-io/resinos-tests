@@ -1,3 +1,49 @@
+/**
+ * # Teardown
+ *
+ * You can register functions to be carried out upon "teardown" of the suite or test. These will
+ * execute when the test ends, regardless of passing or failing:
+ *
+ * ```js
+ * this.suite.teardown.register(() => {
+ *    this.log('Worker teardown');
+ *    return this.context.get().worker.teardown();
+ * });
+ * ```
+ *
+ * If registered in the suite, this will be carried out upon the suite (the collection of tests
+ * ending. You can also add individual teardowns within tests, that will execute when the individual
+ * test has ended. In this example here, within the test, we create an applciation, and after the
+ * test, we wish to remove that application:
+ *
+ * @example
+ * ```js
+ *  module.exports = {
+ * 	 title: 'Example',
+ * 		 tests: [
+ * 			 {
+ * 				 title: 'Move device to another application',
+ * 				 run: async function(test) {
+ * 					 // create an app
+ * 					 await this.context.get().balena.sdk.models.application.create({
+ * 						 name: APP,
+ * 						 deviceType: DEVICE_TYPE,
+ * 						 organization: ORG,
+ * 					 });
+ * 					 // Register a teardown that will remove the test when the test ends
+ * 					 this.teardown.register(() => {
+ * 						 return this.context.get().balena.sdk.models.application.remove(APP);
+ * 					 });
+ * 					 // THE REST OF THE TEST CODE
+ * 				 }
+ * 			 }
+ * 		 ]
+ *  }
+ * ```
+ *
+ * @module Teardown
+ */
+
 /*
  * Copyright 2018 balena
  *

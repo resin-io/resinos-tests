@@ -1,3 +1,20 @@
+/**
+ * The worker class can be used to control the testbot hardware. In the `suite.js` file, you can
+ * create an instance of it, and then use its methods to flash the DUT, power it on/off, and set up a
+ * network AP for the DUT to connect to.
+ *
+ * @example
+ * ```js
+ *  const Worker = this.require('common/worker');
+ *  this.suite.context.set({
+ *      worker: new Worker(DEVICE_TYPE_SLUG, this.getLogger()), // Add an instance of worker to the context
+ *  });
+ *  const Worker = this.require('common/worker');
+ *  const worker = new Worker(DEVICE_TYPE_SLUG, this.getLogger())
+ * ```
+ * @module Leviathan Worker helpers
+ */
+
 /*
  * Copyright 2018 balena
  *
@@ -37,6 +54,13 @@ module.exports = class Worker {
 		this.logger = logger;
 	}
 
+	/**
+	 * Flash the provided OS image onto the connected DUT
+	 *
+	 * @param {string} imagePath path of the image to be flashed onto the DUT
+	 *
+	 * @category helper
+	 */
 	async flash(imagePath) {
 		this.logger.log('Preparing to flash');
 
@@ -89,12 +113,22 @@ module.exports = class Worker {
 		this.logger.log('Flash completed');
 	}
 
+	/**
+	 * Turn the DUT on
+	 *
+	 * @category helper
+	 */
 	async on() {
 		this.logger.log('Powering on DUT');
 		await rp.post(`${this.url}/dut/on`);
 		this.logger.log('DUT powered on');
 	}
 
+	/**
+	 * Turn the DUT off
+	 *
+	 * @category helper
+	 */
 	async off() {
 		this.logger.log('Powering off DUT');
 		await rp.post(`${this.url}/dut/off`);
@@ -150,6 +184,25 @@ module.exports = class Worker {
 		}
 	}
 
+	/**
+	 * Executes command-line operations in the host OS of the DUT. Assuming the DUT is
+	 * connected to the access point broadcasted by the testbot:
+	 *
+	 * @example
+	 * ```js
+	 * const Worker = this.require('common/worker');
+	 * const worker = new Worker(DEVICE_TYPE_SLUG, this.getLogger())
+	 * await worker.executeCommandInHostOS('cat /etc/hostname', `${UUID}.local`);
+	 * ```
+	 *
+	 * @param {string} command command to be executed on the DUT
+	 * @param {string} target local UUID of the DUT, example:`${UUID}.local`
+	 * @param {{"interval": number, "tries": number}} timeout object containing details of how many times the
+	 * command needs to be retried and the intervals between each command execution
+	 * @returns {string} Output of the command that was exected on hostOS of the DUT
+	 *
+	 * @category helper
+	 */
 	async executeCommandInHostOS(
 		command,
 		target,
@@ -187,8 +240,17 @@ module.exports = class Worker {
 		);
 	}
 
-	async pushContainerToDUT(target, source, containerName){
-		// use cli to push container
+	/**
+	 * Pushes a release to an application from a given directory for unmanaged devices
+	 *
+	 * @param {string} target  the <UUID> for the target device
+	 * @param {string} source The path to the directory containing the docker-compose/Dockerfile for the containers
+	 * @param {string} containerName The name of the container to verify is push has succeeded.
+	 * @returns {string} returns state of the device
+	 *
+	 * @category helper
+	 */
+	async pushContainerToDUT(target, source, containerName) {
 		await retry(
 			async () => {
 				await exec(
@@ -200,7 +262,6 @@ module.exports = class Worker {
 				interval: 5000,
 			},
 		);
-
 		// now wait for new container to be available
 		let state = {};
 		await utils.waitUntil(async () => {
@@ -213,10 +274,18 @@ module.exports = class Worker {
 			return state.services[containerName] != null;
 		}, false);
 
-		return state
+		return state;
 	}
 
-	async executeCommandInContainer(command, containerName, target){
+	/**
+	 * Executes the command in the targeted container of a device
+	 * @param {string} command The command to be executed
+	 * @param {string} containerName The name of the service/container to run the command in
+	 * @param {*} target The `<UUID.local>` of the target device
+	 * @returns {string} output of the command that is executed on the targetted container of the device
+	 * @category helper
+	 */
+	async executeCommandInContainer(command, containerName, target) {
 		// get container ID
 		const state = await rp({
 			method: 'GET',
@@ -225,13 +294,19 @@ module.exports = class Worker {
 		});
 
 		const stdout = await this.executeCommandInHostOS(
-				`balena exec ${state.services[containerName]} ${command}`,
-				target,
+			`balena exec ${state.services[containerName]} ${command}`,
+			target,
 		);
 		return stdout;
 	}
 
-	async rebootDut (target) {
+	/**
+	 * Triggers a reboot on the target device and waits until the device comes back online
+	 *
+	 * @param {string} target
+	 * @category helper
+	 */
+	async rebootDut(target) {
 		this.logger.log(`Rebooting the DUT`);
 		await this.executeCommandInHostOS(
 			`touch /tmp/reboot-check && systemd-run --on-active=2 reboot`,
@@ -246,25 +321,30 @@ module.exports = class Worker {
 			);
 		}, false);
 		this.logger.log(`DUT has rebooted & is back online`);
-	};
+	}
 
-	async getOSVersion(target){
+	/**
+	 * Fetches OS version available on the DUT's `/etc/os-release` file
+	 *
+	 * @param {string} target
+	 * @returns {string} returns OS version
+	 * @category helper
+	 */
+	async getOSVersion(target) {
 		// maybe https://github.com/balena-io/leviathan/blob/master/core/lib/components/balena/sdk.js#L210
 		// will do? that one works entirely on the device though...
 		const output = await this.executeCommandInHostOS(
-			"cat /etc/os-release",
-			target
-		  );
+			'cat /etc/os-release',
+			target,
+		);
 		let match;
-		output
-		  .split("\n")
-		  .every(x => {
-			if (x.startsWith("VERSION=")) {
-			  match = x.split("=")[1];
-			  return false;
+		output.split('\n').every(x => {
+			if (x.startsWith('VERSION=')) {
+				match = x.split('=')[1];
+				return false;
 			}
 			return true;
-		  })
+		});
 		return match.replace(/"/g, '');
-	  }
+	}
 };

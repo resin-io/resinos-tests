@@ -1,3 +1,41 @@
+/**
+ * # balenaOS helpers
+ *
+ * The `BalenaOS` helper class can be used to configure and unpack the OS image that you will use in the test. This allows you to inject config options and network credentials into your image.
+ *
+ * ```js
+ * const network_conf = {
+ *    ssid: SSID,
+ *    psk: PASSWORD,
+ *    nat: true,
+ * }
+ *
+ * const os = new BalenaOS(
+ *   {
+ *      deviceType: DEVICE_TYPE_SLUG,
+ *      network: network_conf,
+ *      configJson: {
+ *          uuid: UUID,
+ *          persistentLogging: true
+ *      }
+ *   },
+ *   this.getLogger()
+ * );
+ * await os.fetch()
+ * await os.configure()
+ * ```
+ *
+ * Alternatively, you can use the CLI to perform these functions - the CLI is imported in the testing environment:
+ *
+ * ```js
+ * await exec(`balena login --token ${API_KEY}`)
+ * await exec(`balena os configure ${PATH_TO_IMAGE} --config-network wifi --config-wifi-key ${PASSWORD}
+ * --config-wifi-ssid ${SSID}`);
+ * ```
+ *
+ * @module balenaOS helpers
+ */
+
 /*
  * Copyright 2017 balena
  *
@@ -91,7 +129,9 @@ async function isGzip(filePath) {
 }
 
 function id() {
-	return `${Math.random().toString(36).substring(2, 10)}`;
+	return `${Math.random()
+		.toString(36)
+		.substring(2, 10)}`;
 }
 
 module.exports = class BalenaOS {
@@ -103,7 +143,7 @@ module.exports = class BalenaOS {
 		this.network = options.network;
 		this.image = {
 			input: options.image || config.get('leviathan.uploads').image,
-			path: join(config.get('leviathan.downloads'), `image-${id()}`)
+			path: join(config.get('leviathan.downloads'), `image-${id()}`),
 		};
 		this.configJson = options.configJson || {};
 		this.contract = {
@@ -115,7 +155,13 @@ module.exports = class BalenaOS {
 		this.releaseInfo = { version: null, variant: null };
 	}
 
-	// calling the fetch method will prepare the image to be used - either unzipping it or moving it to the working directory
+	/**
+	 * Prepares the received image/artifact to be used - either unzipping it or moving it to the Leviathan working directory
+	 *
+	 * @remark Leviathan creates a temporary working directory that can referenced using `config.get('leviathan.downloads')`
+	 *
+	 * @category helper
+	 */
 	async fetch() {
 		this.logger.log(`Unpacking the file: ${this.image.input}`);
 		const unpack = await isGzip(this.image.input);
@@ -131,6 +177,12 @@ module.exports = class BalenaOS {
 		}
 	}
 
+	/**
+	 * Parses version and variant from balenaOS images
+	 * @param {string} image
+	 *
+	 * @category helper
+	 */
 	async readOsRelease(image = this.image.path) {
 		const readVersion = async (pattern, field) => {
 			this.logger.log(`Checking ${field} in os-release`);
@@ -182,6 +234,11 @@ module.exports = class BalenaOS {
 		assignIn(this.configJson, configJson);
 	}
 
+	/**
+	 * Configures balenaOS image with specifc configuration (if provided), and injects required network configuration
+	 *
+	 * @category helper
+	 */
 	async configure() {
 		this.readOsRelease();
 		this.logger.log(`Configuring balenaOS image: ${this.image.input}`);
