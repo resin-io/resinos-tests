@@ -18,6 +18,10 @@
                 {
                     "title": "Tips & Reference",
                     "source": "../documentation/reference-tips.md"
+                },
+                {
+                    "title": "Links, and more links",
+                    "source": "../documentation/learn-more.md"
                 }
             ]
         }
